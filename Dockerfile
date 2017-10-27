@@ -5,6 +5,10 @@ ARG LIBTORRENT_VERSION=0.13.6
 
 RUN addgroup -S rtorrent \
  && adduser -S -G rtorrent -s /bin/sh -h /var/lib/rtorrent rtorrent \
+ && mkdir /var/lib/rtorrent/sessions \
+ && mkdir /var/lib/rtorrent/watch \
+ && mkdir /var/lib/rtorrent/downloads \
+ && chown -R rtorrent: /var/lib/rtorrent \
  && apk add --no-cache --update \
         ncurses \
         libcurl \
@@ -44,5 +48,11 @@ RUN addgroup -S rtorrent \
  && make install \
  && rm -rf /tmp/* \
  && apk del .build-deps
+
+COPY .rtorrent.rc /var/lib/rtorrent/
+
+WORKDIR /var/lib/rtorrent
+
+USER rtorrent
 
 ENTRYPOINT [ "rtorrent" ]
